@@ -1,0 +1,49 @@
+1.the route will be created in router file.
+
+2.the user/captain user will be created in service file
+
+3.all inside things will be created in controller inclusing hashing, generate token, comparing password.
+
+4.user data will be created on user model and main code of generating token, hashing password, comparing password will be writing here.
+
+5.register logic => 
+        validate err, 
+        if no err then,
+        get data field from req.body, 
+        hashpassword,
+        check if user is already present or not,
+        if not then create user
+        generate token and send the token and user to response.
+
+6. login logic => 
+        validate err,
+        if not then get email and password from body,
+        then check if the email and,
+        compare the password and check if present or not,
+        if yes then generate token,
+        then send it to the cookie along with token and user
+
+7. profile logic =>
+        res.status(200).json({captain: req.captain});
+
+8. logout logic =>
+        check if token is there or not,
+        then blacklist then token by creating that token as blacklisted,
+        clear that token.                
+
+9.middleware logic =>
+        check if token is is present or not
+        if no then send "auothorized" 
+        if yes then check the token is blacklisted or not
+        if yes then send "auothorized"
+        otherwise 
+        try{
+        const decoded= jwt.verify(token, process.env.JWT_SECRET);
+        const user= await userModels.findById(decoded._id);
+
+        req.user= user;
+        return next();
+        
+    } catch(err){
+        return res.status(401).json({message: 'Unauthorized'});
+    }
