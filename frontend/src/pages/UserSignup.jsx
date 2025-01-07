@@ -1,30 +1,47 @@
-import React, { useState } from "react";;
-import { Link } from "react-router-dom";
+import React, { useContext, useState } from "react";
+import { Link, useNavigate } from "react-router-dom";
+import axios from "axios";
+import { userDataContext } from "../context/userContext";
+
+
 
 const UserSignup = () => {
+  const [email, setemail] = useState("");
+  const [password, setpassword] = useState("");
+  const [firstName, setfirstName] = useState("");
+  const [lastName, setlastName] = useState("");
+  const [userData, setUserData] = useState({});
 
-const [email, setemail] = useState('')
-const [password, setpassword] = useState('')
-const [firstName, setfirstName] = useState('')
-const [lastName, setlastName] = useState('')
-const [userData, setUserData] = useState({})
+  const navigate = useNavigate();
+  const {user, setUser}= useContext(userDataContext)
 
-  const submitHandler = (e) => {
+  const submitHandler = async (e) => {
     e.preventDefault();
-    setUserData({
+    const newUser = {
       email: email,
       password: password,
-      fullName:{
-        firstName: firstName,
-        lastName: lastName
-      }
-    })
+      fullname: {
+        firstname: firstName,
+        lastname: lastName,
+      },
+    };
 
-    setemail('')
-    setpassword('')
-    setfirstName('')
-    setlastName('')
-  }
+    const response = await axios.post(
+      `${import.meta.env.VITE_BASE_URL}/users/register`,
+      newUser
+    );
+    if (response.status === 201) {
+      const data = response.data;
+      setUser(data.user);
+      localStorage.setItem("token", data.token);
+      navigate("/home");
+    }
+
+    setemail("");
+    setpassword("");
+    setfirstName("");
+    setlastName("");
+  };
   return (
     <div className="py-7 px-8 flex flex-col justify-between h-screen">
       <div>
@@ -37,7 +54,7 @@ const [userData, setUserData] = useState({})
           <h3 className="text-xl mb-2 font-semibold">What's Your Name</h3>
           <div className="flex gap-4 mb-3">
             <input
-            required
+              required
               type="text"
               value={firstName}
               onChange={(e) => setfirstName(e.target.value)}
@@ -45,7 +62,7 @@ const [userData, setUserData] = useState({})
               className="bg-[#eeeeee] mb-4 rounded outline-none px-4 py-2 border w-1/2 text-lg font-medium placeholder:text-base"
             />
             <input
-            required
+              required
               type="text"
               value={lastName}
               onChange={(e) => setlastName(e.target.value)}
@@ -71,8 +88,8 @@ const [userData, setUserData] = useState({})
             placeholder="******"
             className="bg-[#eeeeee] mb-5 rounded px-4 py-2 outline-none border w-full text-lg placeholder:text-base"
           />
-          <button className="bg-[#111] text-white mb-3 rounded px-4 py-2 border w-full text-lg">
-            Login
+          <button className="bg-[#111] text-white font-medium mb-3 rounded px-4 py-2 border w-full text-lg">
+            Create Account
           </button>
         </form>
         <p className="text-center">
@@ -83,7 +100,11 @@ const [userData, setUserData] = useState({})
         </p>
       </div>
       <div>
-        <p className="text-[9px] leading-tight">By proceeding, you can consent to get calls, Whatsapp or SMS, including by automated means, from Uber and it's affiliates to the number provided.</p>
+        <p className="text-[9px] leading-tight">
+          By proceeding, you can consent to get calls, Whatsapp or SMS,
+          including by automated means, from Uber and it's affiliates to the
+          number provided.
+        </p>
       </div>
     </div>
   );
