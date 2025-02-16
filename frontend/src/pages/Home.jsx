@@ -24,7 +24,7 @@ const Home = () => {
   const [waitingForDriver, setWaitingForDriver] = useState(false)
 
 
-  const submitHandler = () => {
+  const submitHandler = (e) => {
     e.preventDefault();
   };
 
@@ -190,9 +190,9 @@ const Home = () => {
         <ConfirmedVehicle confirmRidePanel={confirmRidePanel} setConfirmRidePanel={setConfirmRidePanel} setVehicleFound={setVehicleFound} />
       </div>
       <div ref={vehicleFoundRef} className="fixed z-10 bottom-0 px-3 py-8 bg-white w-full translate-y-full">
-        <LookingForDriver setVehicleFound={setVehicleFound}/>
+        <LookingForDriver setVehicleFound={setVehicleFound} vehicleFound={vehicleFound} />
       </div>
-      <div ref={waitingForDriverRef} className="fixed z-10 bottom-0 px-3 py-8 bg-white w-full">
+      <div ref={waitingForDriverRef} className="fixed z-10 bottom-0 px-3 py-8 bg-white w-full translate-y-full">
         <WaitForDriver waitingForDriver={waitingForDriver} setWaitingForDriver={setWaitingForDriver} />
       </div>
     </div>
