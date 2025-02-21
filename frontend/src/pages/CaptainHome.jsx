@@ -7,16 +7,18 @@ import gsap from "gsap";
 import ConfirmRidePopUp from "../components/ConfirmRidePopUp";
 import { SocketContext } from "../context/SocketContext";
 import { CaptainDataContext } from "../context/CaptainContext";
+import axios from "axios";
+import LiveTracking from "../components/LiveTracking";
 
 const CaptainHome = () => {
-  const [ridePopupPanel, setRidePopupPanel] = useState(true);
+  const [ridePopupPanel, setRidePopupPanel] = useState(false);
   const ridePopupPanelRef = useRef(null);
   const [confirmRidePopUp, setConfirmRidePopUp] = useState(false);
   const confirmRidePopUpPanelRef = useRef(null);
 
   const { socket } = useContext(SocketContext);
   const { captain } = useContext(CaptainDataContext);
-  const [locationError, setLocationError] = useState(null);
+  const [ride, setRide] = useState(null);
 
   useEffect(() => {
     socket.emit("join", {
@@ -26,7 +28,6 @@ const CaptainHome = () => {
     const updateLocation = () => {
       if (navigator.geolocation) {
         navigator.geolocation.getCurrentPosition((position) => {
-
           socket.emit("update-location-captain", {
             userId: captain._id,
             location: {
@@ -40,13 +41,28 @@ const CaptainHome = () => {
 
     const locationInterval = setInterval(updateLocation, 10000);
     updateLocation();
-
   }, []);
 
   socket.on("new-ride", (data) => {
+    // console.log(data);
     setRide(data);
     setRidePopupPanel(true);
   });
+
+  async function confirmRide() {
+    const response = await axios.post(`${import.meta.env.VITE_BASE_URL}/rides/confirm`,{
+      rideId: ride._id,
+      captainId: captain._id,
+    },{
+      headers: {
+        Authorization: `Bearer ${localStorage.getItem("token")}`
+      }
+    })
+
+    setRidePopupPanel(false);
+    setConfirmRidePopUp(true);
+    setRide(ride)
+  }
 
   useGSAP(
     function () {
@@ -105,11 +121,7 @@ const CaptainHome = () => {
         </Link>
       </div>
       <div className="h-[60%]">
-        <img
-          className="w-full h-full object-cover"
-          src="https://simonpan.com/wp-content/themes/sp_portfolio/assets/uber-challenge.jpg"
-          alt=""
-        />
+        <LiveTracking/>
       </div>
       <div className="h-2/5 p-6">
         <CaptainDetail />
@@ -122,6 +134,8 @@ const CaptainHome = () => {
           ridePopupPanel={ridePopupPanel}
           setRidePopupPanel={setRidePopupPanel}
           setConfirmRidePopUp={setConfirmRidePopUp}
+          ride={ride}
+          confirmRide={confirmRide}
         />
       </div>
       <div
@@ -129,6 +143,7 @@ const CaptainHome = () => {
         className="fixed z-10 h-screen bottom-0 px-3 py-8 bg-white w-full translate-y-full"
       >
         <ConfirmRidePopUp
+          ride={ride}
           setConfirmRidePopUp={setConfirmRidePopUp}
           setRidePopupPanel={setRidePopupPanel}
           confirmRidePopUp={confirmRidePopUp}

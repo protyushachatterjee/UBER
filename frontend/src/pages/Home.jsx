@@ -10,9 +10,9 @@ import LookingForDriver from "../components/LookingForDriver";
 import WaitForDriver from "../components/WaitForDriver";
 import { SocketContext } from "../context/SocketContext";
 import { userDataContext } from "../context/userContext";
-import { useNavigate } from 'react-router-dom';
+import { useNavigate } from "react-router-dom";
+import LiveTracking from "../components/LiveTracking";
 // import LiveTracking from '../components/LiveTracking';
-
 
 const Home = () => {
   const [pickup, setPickup] = useState("");
@@ -33,32 +33,28 @@ const Home = () => {
   const [destinationSuggestions, setDestinationSuggestions] = useState([]);
   const [fare, setFare] = useState({});
   const [vehicleType, setVehicleType] = useState("");
+  const [ ride, setRide ] = useState(null);
 
+  const navigate = useNavigate();
 
-  const navigate = useNavigate()
+  const { socket } = useContext(SocketContext);
+  const { user } = useContext(userDataContext);
 
-    const { socket } = useContext(SocketContext)
-    const { user } = useContext(userDataContext)
+  useEffect(() => {
+    socket.emit("join", { userType: "user", userId: user._id });
+  }, [user]);
 
-    useEffect(() => {
-        socket.emit("join", { userType: "user", userId: user._id })
-    }, [ user ])
+  socket.on("ride-confirmed", (ride) => {
+    setVehicleFound(false);
+    setWaitingForDriver(true);
+    setRide(ride);
+  });
 
-    socket.on('ride-confirmed', ride => {
-
-
-        setVehicleFound(false)
-        setWaitingForDriver(true)
-        setRide(ride)
-    })
-
-    socket.on('ride-started', ride => {
-        console.log("ride")
-        setWaitingForDriver(false)
-        navigate('/riding', { state: { ride } }) // Updated navigate to include ride data
-    })
-
-  
+  socket.on("ride-started", (ride) => {
+    // console.log("ride");
+    setWaitingForDriver(false);
+    navigate("/riding", { state: { ride } }); // Updated navigate to include ride data
+  });
 
   const handlePickupChange = async (e) => {
     setPickup(e.target.value);
@@ -73,8 +69,9 @@ const Home = () => {
         }
       );
       setPickupSuggestions(response.data);
-    } catch {
+    } catch(error) {
       // handle error
+      res.status(400).json({ message: error.message });
     }
   };
 
@@ -244,11 +241,7 @@ const Home = () => {
         alt=""
       />
       <div className="h-screen w-screen">
-        <img
-          className="w-full h-full bg-center object-cover"
-          src="https://simonpan.com/wp-content/themes/sp_portfolio/assets/uber-challenge.jpg"
-          alt=""
-        />
+        <LiveTracking/>
       </div>
       <div className="flex flex-col justify-end h-screen absolute top-0 w-full">
         <div className="h-[28%] p-5 bg-white relative">
@@ -361,6 +354,7 @@ const Home = () => {
         <WaitForDriver
           waitingForDriver={waitingForDriver}
           setWaitingForDriver={setWaitingForDriver}
+          ride={ride}
         />
       </div>
     </div>
