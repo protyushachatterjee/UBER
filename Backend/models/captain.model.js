@@ -37,7 +37,7 @@ const captainSchema= new Schema({
     status:{
         type: String,
         enum: ['active', 'inactive'],
-        default: 'inactive',
+        default: 'active',
     },
 
     vehicle:{
@@ -60,16 +60,17 @@ const captainSchema= new Schema({
         },
         
     },
-    location:{
-        lat:{
+    location: {
+        ltd: {
             type: Number,
         },
-        lng:{
+        lng: {
             type: Number,
         }
-    },
+    }
 });
 
+captainSchema.index({ location: '2dsphere' });
 
 captainSchema.methods.generateAuthToken= async function(){
     const captain= this;

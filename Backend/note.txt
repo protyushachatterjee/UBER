@@ -47,3 +47,20 @@
     } catch(err){
         return res.status(401).json({message: 'Unauthorized'});
     }
+
+10. For Map Api make a new controller and service and create a Address, Distance & time calculation and Suggetion service
+as well as routes.
+
+in service file: 
+        1.Get the Api key
+        2.Create the API url
+        3.in try-catch block if the data is coming by axios then show data other wise error
+        4.in Catch block handle the expection error.
+
+in controller file:
+        1. check the error from validationResult
+        2.if error comes the show error if not
+        3.take the data from req.query & 
+        const {input} = req.query;
+        const data = await mapService.getAutoComplete(input);
+        res.status(200).json(data);        

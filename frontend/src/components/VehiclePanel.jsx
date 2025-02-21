@@ -2,9 +2,10 @@ import React from 'react'
 import uberCar from "../assets/uber_car.png";
 import motorcycle from "../assets/uber_cycle.png";
 
-const VehiclePanel = ({setVehiclePanel, vehiclePanel, setConfirmRidePanel}) => {
+const VehiclePanel = ({setVehiclePanel, vehiclePanel,  setConfirmRidePanel, fare, selectVehicle}) => {
   return (
-    <div><h5
+    <div>
+      <h5
     onClick={() => {
       setVehiclePanel(!vehiclePanel);
     }}
@@ -15,6 +16,7 @@ const VehiclePanel = ({setVehiclePanel, vehiclePanel, setConfirmRidePanel}) => {
   <h3 className="text-2xl font-semibold mb-5">Choose a vehicle</h3>
   <div onClick={()=>{
     setConfirmRidePanel(true)
+    selectVehicle('car');
   }} className="flex items-center justify-between w-full p-3 bg-gray-50 border-2 active:border-black rounded-xl mb-3">
     <img className="h-12" src={uberCar} alt="" />
     <div className="w-1/2 ml-2">
@@ -29,10 +31,11 @@ const VehiclePanel = ({setVehiclePanel, vehiclePanel, setConfirmRidePanel}) => {
         Affordable, compact rides
       </p>
     </div>
-    <h2 className="text-xl font-semibold">₹198.20</h2>
+    <h2 className="text-xl font-semibold">₹{fare.car}</h2>
   </div>
   <div onClick={()=>{
     setConfirmRidePanel(true)
+    selectVehicle('motorcycle');
   }} className="flex items-center justify-between w-full p-3 bg-gray-50 border-2 active:border-black rounded-xl mb-3">
     <img className="h-12" src={motorcycle} alt="" />
     <div className="w-1/2 ">
@@ -47,10 +50,10 @@ const VehiclePanel = ({setVehiclePanel, vehiclePanel, setConfirmRidePanel}) => {
         Affordable, motorcycle rides
       </p>
     </div>
-    <h2 className="text-xl font-semibold">₹65</h2>
+    <h2 className="text-xl font-semibold">₹{fare.motorcycle}</h2>
   </div>
   </div>
-  )
+  );
 }
 
-export default VehiclePanel
+export default VehiclePanel;

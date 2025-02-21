@@ -28,14 +28,14 @@ const UserProtectedWrapper = ({ children }) => {
                 setIsLoading(false);
             }
         }).catch((error) => {
-            console.log(err);
+            res.status(401).json({ massage: error.message });
             localStorage.removeItem("token");
             navigate("/login");
         });
 
 
     if(isLoading){
-        return <div>Loading...</div>
+        return <div className="bg-black h-screen w-screen text-white flex justify-center items-center text-5xl font-semibold">Loading...</div>
     }
 
     return <>{children}</>;
